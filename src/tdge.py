@@ -17,12 +17,13 @@
 # importing needed modules
 import pygame
 from datetime import datetime
+import numba
 
 # the main Game class
 class Game(object):
 
 	# initializing function
-	def __init__(self, movement=True, width=10, height=10, title="My Game", icon_path="", rotation=[0, 0, 0], position=[0, 0, 0], resizable=False, fullscreen=False, velocity=1):
+	def __init__(self, movement=True, width=10, height=10, title="My Game", icon_path="", rotation=[0, 0, 0], position=[0, 0, 0], resizable=False, fullscreen=False, velocity=1, show_fps=False):
 		
 		# checking if the user passed correct arguments; if not: raise an error
 		if type(movement) != bool:
@@ -73,6 +74,9 @@ class Game(object):
 			error = "Velocity should be an integer or a float."
 			raise TypeError(error)
 
+		if type(show_fps) != bool:
+			error = "The show_fps argument should be a bool."
+
 		if icon_path:
 			try:
 				open(icon_path, "r").close()
@@ -108,6 +112,9 @@ class Game(object):
 		self.color = [0, 0, 0]
 		self.image_path = ""
 		self.update = False
+		self.show_fps = show_fps
+		self.forward = False
+		self.update_background = True
 
 		# setting the objects variable to []. it should store all objects in the game
 		self.objects = []
@@ -186,8 +193,13 @@ class display(object):
 
 		# updating the background if game.update is True
 		if game.update:
-			if game.image_path: game.win.blit(game.image, (0, 0))
-			else: game.win.fill(game.color)
+			if game.update_background:
+				if not game.forward:
+					if game.image_path: game.win.blit(game.image, (0, 0))
+					else: game.win.fill(game.color)
+					game.update_background = False
+			else:
+				game.update_background = True
 
 		# checking the type of the given object
 		if type(object) == Cube:
@@ -293,17 +305,22 @@ def start_game(game, code=None):
 
 	while running:
 
-		# printing FPS every second
-		# getting the current time
-		now = datetime.now().second
-		# checking, if one second is over
-		if now - start >= 1:
-			# printing FPS
-			print(frame_count)
-			# resetting the timer
-			start = datetime.now().second
-			# resetting the FPS
-			frame_count = 0
+		game.forward = False
+
+		if game.show_fps:
+			# printing FPS every second
+			# getting the current time
+			now = datetime.now().second
+			# checking, if one second is over
+			if now - start >= 1:
+				# printing FPS
+				print(frame_count)
+				# resetting the timer
+				start = datetime.now().second
+				# resetting the FPS
+				frame_count = 0
+			# increasing FPS because the while loop ended and will start again
+			frame_count += 1
 
 		# if clicked the "x" button: quit the game
 		if pygame.event.get(pygame.QUIT): running = False
@@ -326,24 +343,25 @@ def start_game(game, code=None):
 			if keys[pygame.K_w]:
 				game.position = (game.position[0], game.position[1], game.position[2] + game.velocity)
 				game.update = True
+				game.forward = True
 			# if the user pressed "s"
 			if keys[pygame.K_s]:
 				game.position = (game.position[0], game.position[1], game.position[2] - game.velocity)
 				game.update = True
+				game.forward = False
 			# if the user pressed "a"
 			if keys[pygame.K_a]:
 				game.position = (game.position[0] - game.velocity, game.position[1], game.position[2])
 				game.update = True
+				game.forward = False
 			# if the user pressed "d"
 			if keys[pygame.K_d]:
 				game.position = (game.position[0] + game.velocity, game.position[1], game.position[2])
 				game.update = True
+				game.forward = False
 
 		for object in game.objects:
 			display.draw(game, object)
-
-		# increasing FPS because the while loop ended and will start again
-		frame_count += 1
 
 		if callable(code):
 			code()
