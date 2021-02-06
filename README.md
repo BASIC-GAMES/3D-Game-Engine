@@ -8,7 +8,7 @@ You will be able to install this library using **pip** later. This code is still
 ## Usage
 
 ```python
-# importing the library
+# importing everything from the library
 from BasicEngine import *
 
 # creating a game surface
