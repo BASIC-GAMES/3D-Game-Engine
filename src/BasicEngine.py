@@ -23,7 +23,7 @@ import numba
 class Game(object):
 
 	# initializing function
-	def __init__(self, movement=True, width=10, height=10, title="My Game", icon_path="", rotation=[0, 0, 0], position=[0, 0, 0], resizable=False, fullscreen=False, velocity=1, show_fps=False):
+	def __init__(self, movement=True, width=10, height=10, title="My Game", icon_path="", rotation=[0, 0, 0], position=[0, 0, 0], resizable=False, fullscreen=False, velocity=1, show_fps=False, update_frequency=10):
 		
 		# checking if the user passed correct arguments; if not: raise an error
 		if type(movement) != bool:
@@ -76,6 +76,15 @@ class Game(object):
 
 		if type(show_fps) != bool:
 			error = "The show_fps argument should be a bool."
+			raise TypeError(error)
+		
+		if type(update_frequency) != int:
+			error = "The update_frequency argument should be an int."
+			raise TypeError(error)
+			
+		if update_frequency < 0:
+			error = "The update_frequency should be greater than or equal to 0."
+			raise ValueError(error)
 
 		if icon_path:
 			try:
@@ -114,7 +123,8 @@ class Game(object):
 		self.update = False
 		self.show_fps = show_fps
 		self.forward = False
-		self.update_background = True
+		self.update_background = 0
+		self.update_frequency = update_frequency
 
 		# setting the objects variable to []. it should store all objects in the game
 		self.objects = []
@@ -193,13 +203,13 @@ class display(object):
 
 		# updating the background if game.update is True
 		if game.update:
-			if game.update_background:
+			if game.update_background == game.update_frequency:
 				if not game.forward:
 					if game.image_path: game.win.blit(game.image, (0, 0))
 					else: game.win.fill(game.color)
-					game.update_background = False
+					game.update_background = 0
 			else:
-				game.update_background = True
+				game.update_background += 1
 
 		# checking the type of the given object
 		if type(object) == Cube:
