@@ -23,7 +23,7 @@ import numba
 class Game(object):
 
 	# initializing function
-	def __init__(self, movement=True, width=10, height=10, title="My Game", icon_path="", rotation=[0, 0, 0], position=[0, 0, 0], resizable=False, fullscreen=False, velocity=1, show_fps=False, update_frequency=10):
+	def __init__(self, movement=True, width=10, height=10, title="My Game", icon_path="", rotation=[0, 0, 0], position=[0, 0, 0], resizable=False, fullscreen=False, velocity=1, show_fps=False, update_frequency=10, fps_lock=120):
 		
 		# checking if the user passed correct arguments; if not: raise an error
 		if type(movement) != bool:
@@ -86,6 +86,14 @@ class Game(object):
 			error = "The update_frequency should be greater than or equal to 0."
 			raise ValueError(error)
 
+		if type(fps_lock) != int:
+			error = "The fps_lock argument should be an int."
+			raise TypeError(error)
+		
+		if fps_lock < 1:
+			error = "The fps_lock argument should be greater than or equal to 1."
+			raise ValueError(error)
+
 		if icon_path:
 			try:
 				open(icon_path, "r").close()
@@ -125,6 +133,7 @@ class Game(object):
 		self.forward = False
 		self.update_background = 0
 		self.update_frequency = update_frequency
+		self.fps_lock = fps_lock
 
 		# setting the objects variable to []. it should store all objects in the game
 		self.objects = []
@@ -376,7 +385,7 @@ def start_game(game, code=None):
 		if callable(code):
 			code()
 
-		clock.tick(120)
+		clock.tick(game.fps_lock)
 
 	# exit the game when it is closed
 	pygame.quit()
