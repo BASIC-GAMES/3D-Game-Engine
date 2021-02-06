@@ -1,4 +1,4 @@
-from tdge import *
+from BasicEngine import *
 
 game = Game(width=500, height=500, title="3D Game Engine Test", show_fps=True)
 
