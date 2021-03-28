@@ -1,7 +1,8 @@
 # Basic Engine
 
 Basic Engine is a Python library developed by Basic Games and it used for creating 3D Games. **It is still in development**.
-Update: although it looks like I abandoned the project actually I did not. Right now I am busy with other projects and school.
+
+Update: Although it looks like I abandoned the project actually I did not. Right now I am busy with other projects and school. I hope I will return to the development of the BasicEngine soon.
 
 ## Installation
 
